@@ -6,6 +6,7 @@ class User(db.Model):
 
     username = db.Column(db.String(16))
     password = db.Column(db.String(60))
+    telegram_chat_id = db.Column(db.BigInteger)
 
     default_account = db.Column(db.Integer, db.ForeignKey('account.id'))
 
