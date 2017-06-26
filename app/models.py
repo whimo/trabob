@@ -6,9 +6,9 @@ class User(db.Model):
 
     username = db.Column(db.String(16))
     password = db.Column(db.String(60))
-    telegram_chat_id = db.Column(db.BigInteger)
+    telegram_chat_id = db.Column(db.Integer)
 
-    default_account = db.Column(db.Integer, db.ForeignKey('account.id'))
+    default_account_id = db.Column(db.Integer)
 
     accounts = db.relationship('Account', backref='local_user', lazy='dynamic')
 
