@@ -12,6 +12,6 @@ BASEDIR = os.path.abspath(os.path.dirname(__file__))
 WTF_CSRF_ENABLED = True
 SECRET_KEY = '?iu_V-8[InY2vo@ZqHD8|nZuFTu&0{'
 
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql:///trabobdb.corzsedgktxs.us-west-2.rds.amazonaws.com:3306'
+SQLALCHEMY_DATABASE_URI = 'mysql+pymysql:///dbadmin:security1338@trabobdb.corzsedgktxs.us-west-2.rds.amazonaws.com:3306'
 
 TELEGRAM_BOT_TOKEN = '356224566:AAEvmWALrQkLRmKhZ-Fs3AY2dqd4wLMkj80'
