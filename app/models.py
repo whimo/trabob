@@ -4,9 +4,9 @@ from app import db
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String(16))
+    username = db.Column(db.String(16), index=True, unique=True)
     password = db.Column(db.String(60))
-    telegram_chat_id = db.Column(db.Integer)
+    telegram_chat_id = db.Column(db.Integer, index=True)
 
     default_account_id = db.Column(db.Integer)
 

@@ -30,5 +30,25 @@ def login(message):
         else:
             bot.send_message(message.chat.id, 'But not')
 
+    else:
+        bot.send_message(message.chat.id, 'You are already logged in')
+
+
+@bot.message_handler(commands=['add_account'])
+def add_account(message):
+    user = models.User.query.filter_by(telegram_chat_id=message.chat.id).first()
+    if user is None:
+        return
+
+    try:
+        server_name, username, password = message.text.split()[1:]
+    except ValueError:
+        bot.send_message(message.chat.id, 'Usage: `/add_account <server (e.g. ts1.travian.net)> <username> <password>`')
+        return
+
+    account = models.Account(server_url='http://' + server_name, username=username, password=password, user_id=user.id)
+    db.session.add(account)
+    db.session.commit()
+
 
 bot.polling()
