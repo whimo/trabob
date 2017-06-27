@@ -59,7 +59,7 @@ class Account(db.Model):
                 return False
             response = self.request(url=url, data=data)
 
-        return response
+        return response.text
 
     def login(self):
         page = self.request(self.server_url + app.config['LOGIN_URL'])
@@ -84,7 +84,7 @@ class Account(db.Model):
             print('[ERROR] Could not post login data for {}, login failed.'.format(self.username))
             return False
 
-        if 'window._player_uuid = \'\'' in page.text:
+        if 'window._player_uuid = \'\'' in page:
             print('[ERROR] Could not log in player {}, probably incorrect account data provided.'.format(self.username))
             return False
 

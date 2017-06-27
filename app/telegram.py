@@ -47,8 +47,14 @@ def add_account(message):
         return
 
     account = models.Account(server_url='http://' + server_name, username=username, password=password, user_id=user.id)
-    db.session.add(account)
-    db.session.commit()
+
+    if account.login():
+        bot.send_message(message.chat.id, 'Successfully added your account')
+        db.session.add(account)
+        db.session.commit()
+
+    else:
+        bot.send_message(message.chat.id, 'Could not login into your account, probably incorrect data provided')
 
 
 bot.polling()
