@@ -42,11 +42,18 @@ def add_account(message):
 
     try:
         server_name, username, password = message.text.split()[1:]
+        server_url = 'http://' + server_name
+
     except ValueError:
         bot.send_message(message.chat.id, 'Usage: `/add_account <server (e.g. ts1.travian.net)> <username> <password>`')
-        return
+        return False
 
-    account = models.Account(server_url='http://' + server_name, username=username, password=password, user_id=user.id)
+    account = models.Account.query.filter_by(server_url=server_url, username=username).first()
+    if account is not None:
+        bot.send_message(message.chat.id, 'Account already added')
+        return False
+
+    account = models.Account(server_url=server_url, username=username, password=password, user_id=user.id)
 
     if account.login():
         bot.send_message(message.chat.id, 'Successfully added your account')
