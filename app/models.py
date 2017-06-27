@@ -98,5 +98,3 @@ class Account(db.Model):
             return False
 
         return True
-
-        def 
