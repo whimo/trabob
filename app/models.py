@@ -1,5 +1,6 @@
 from app import app, db
 import requests
+import pickle
 from bs4 import BeautifulSoup
 
 
@@ -37,11 +38,16 @@ class Account(db.Model):
     username = db.Column(db.String(100))
     password = db.Column(db.String(100))
 
+    busy_until = db.Column(db.DateTime)
+
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     session = requests.Session()
+    session_dump = db.Column(db.PickleType)
 
     def request(self, url, data={}):
+        self.session = pickle.loads(self.session_dump)
+
         try:
             if len(data) == 0:
                 response = self.session.get(url, headers=app.config['DEFAULT_HEADERS'])
@@ -58,6 +64,9 @@ class Account(db.Model):
             if not self.login():
                 return False
             response = self.request(url=url, data=data)
+
+        self.session_dump = pickle.dumps(self.session, 2)
+        db.session.commit()
 
         return response.text
 
@@ -89,3 +98,5 @@ class Account(db.Model):
             return False
 
         return True
+
+        def 
