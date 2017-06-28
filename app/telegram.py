@@ -17,7 +17,7 @@ def login(message):
             username, password = message.text.split()[1:]
         except ValueError:
             bot.send_message(message.chat.id, 'Usage: `/login <username> <password>`')
-            return
+            return False
 
         user = models.User.query.filter_by(username=username).first()
         if user:
@@ -38,7 +38,7 @@ def login(message):
 def add_account(message):
     user = models.User.query.filter_by(telegram_chat_id=message.chat.id).first()
     if user is None:
-        return
+        return False
 
     try:
         server_name, username, password = message.text.split()[1:]
@@ -62,6 +62,29 @@ def add_account(message):
 
     else:
         bot.send_message(message.chat.id, 'Could not login into your account, probably incorrect data provided')
+
+
+@bot.message_handler(commands=['remove_account'])
+def remove_account(message):
+    user = models.User.query.filter_by(telegram_chat_id=message.chat.id).first()
+    if user is None:
+        return False
+
+    try:
+        server_name, username = message.text.split()[1:]
+
+    except ValueError:
+        bot.send_message(message.chat.id, 'Usage: `/remove_account <server (e.g. ts1.travian.net)> <username>`')
+        return False
+
+    account = models.Account.query.filter_by(server_url='http://' + server_name, username=username).first()
+    if account is None or account.local_user.telegram_chat_id != message.chat.id:
+        bot.send_message(message.chat.id, 'Account not found, probably incorrect data provided')
+        return False
+
+    db.session.delete(account)
+    db.session.commit()
+    bot.send_message(message.chat.id, 'Account removed successfully')
 
 
 bot.polling()

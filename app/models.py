@@ -46,7 +46,8 @@ class Account(db.Model):
     session_dump = db.Column(db.PickleType)
 
     def request(self, url, data={}):
-        self.session = pickle.loads(self.session_dump)
+        if self.session_dump is not None:
+            self.session = pickle.loads(self.session_dump)
 
         try:
             if len(data) == 0:
