@@ -1,6 +1,7 @@
 from app import app, db
 import requests
 import pickle
+import datetime
 from bs4 import BeautifulSoup
 
 
@@ -38,6 +39,7 @@ class Account(db.Model):
     username = db.Column(db.String(100))
     password = db.Column(db.String(100))
 
+    server_timezone = db.Column(db.SmallInteger)
     busy_until = db.Column(db.DateTime)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -99,3 +101,17 @@ class Account(db.Model):
             return False
 
         return True
+
+    def get_server_timezone(self):
+        page = self.request(self.server_url + app.config['VILLAGE_URL'])
+        if not page:
+            print('[ERROR] Could not get the village page for {}.'.format(self.username))
+            return False
+
+        utc_timestamp = int(datetime.datetime.utcnow().timestamp())
+
+        parser = BeautifulSoup(page, 'html5lib')
+        server_timestamp = parser.find('div', {'id': 'servertime'}).span['value']
+
+        self.server_timezone = round((server_timestamp - utc_timestamp) / 3600)
+        return self.server_timezone
