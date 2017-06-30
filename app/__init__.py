@@ -14,4 +14,4 @@ migrate = Migrate(app, db)
 lm = LoginManager(app)
 bcrypt = Bcrypt(app)
 
-from app import views, models
+from app import views, models, travian

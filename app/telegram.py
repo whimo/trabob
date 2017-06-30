@@ -1,4 +1,4 @@
-from app import app, models, db, bcrypt
+from app import app, models, db, bcrypt, travian
 import telebot
 
 bot = telebot.TeleBot(app.config['TELEGRAM_BOT_TOKEN'])
@@ -59,6 +59,9 @@ def add_account(message):
         bot.send_message(message.chat.id, 'Successfully added your account')
         db.session.add(account)
         db.session.commit()
+
+        travian.travian_threads.append(travian.Travian(account.id))
+        travian.travian_threads[-1].start()
 
     else:
         bot.send_message(message.chat.id, 'Could not login into your account, probably incorrect data provided')
