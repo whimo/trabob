@@ -61,12 +61,12 @@ class Account(db.Model):
             print('[ERROR] Network problem, the URL {} cannot be fetched.'.format(url))
             return False
 
-        if 'window._player_uuid = \'\'' in response.text and 'login.php' not in url and len(url) >= 22:
+        if 'href="login.php"' in response.text and 'login.php' not in url and len(url) >= 22:
             print('[WARNING] Player {} suddenly logged off, trying to relogin.'.format(self.username))
 
             if not self.login():
                 return False
-            response = self.request(url=url, data=data)
+            return self.request(url=url, data=data)
 
         self.session_dump = pickle.dumps(self.session, 2)
         db.session.commit()
@@ -96,7 +96,7 @@ class Account(db.Model):
             print('[ERROR] Could not post login data for {}, login failed.'.format(self.username))
             return False
 
-        if 'window._player_uuid = \'\'' in page:
+        if 'href="login.php"' in page:
             print('[ERROR] Could not log in player {}, probably incorrect account data provided.'.format(self.username))
             return False
 
@@ -111,7 +111,7 @@ class Account(db.Model):
         utc_timestamp = int(datetime.datetime.utcnow().timestamp())
 
         parser = BeautifulSoup(page, 'html5lib')
-        server_timestamp = parser.find('div', {'id': 'servertime'}).span['value']
+        server_timestamp = int(parser.find('div', {'id': 'servertime'}).span['value'])
 
         self.server_timezone = round((server_timestamp - utc_timestamp) / 3600)
         return self.server_timezone

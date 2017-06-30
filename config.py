@@ -28,3 +28,6 @@ DEFAULT_HEADERS = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=
 
 LOGIN_URL = '/login.php'
 LOGIN_POST_URL = '/dorf1.php'
+
+RESOURCES_URL = '/dorf1.php'
+VILLAGE_URL = '/dorf2.php'
