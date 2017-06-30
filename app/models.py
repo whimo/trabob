@@ -47,6 +47,17 @@ class Account(db.Model):
     session = requests.Session()
     session_dump = db.Column(db.PickleType)
 
+    # four proxies are to be used in different times
+    _proxy1 = db.Column(db.String(21)) # max: 123.456.789.012:34567
+    _proxy2 = db.Column(db.String(21))
+    _proxy3 = db.Column(db.String(21))
+    _proxy4 = db.Column(db.String(21))
+
+    @property
+    def proxies(self):
+        return list([self._proxy1, self._proxy2, self._proxy3, self._proxy4])
+
+
     def request(self, url, data={}):
         if self.session_dump is not None:
             self.session = pickle.loads(self.session_dump)
