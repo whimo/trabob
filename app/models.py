@@ -1,4 +1,4 @@
-from app import app, db
+from app import app, db, logger
 import requests
 import pickle
 import datetime
@@ -47,6 +47,7 @@ class Account(db.Model):
     session = requests.Session()
     session_dump = db.Column(db.PickleType)
 
+
     def request(self, url, data={}):
         if self.session_dump is not None:
             self.session = pickle.loads(self.session_dump)
@@ -58,11 +59,11 @@ class Account(db.Model):
                 response = self.session.post(url, headers=app.config['DEFAULT_HEADERS'], data=data)
 
         except Exception:
-            print('[ERROR] Network problem, the URL {} cannot be fetched.'.format(url))
+            logger.error('Network problem, the URL {} cannot be fetched.'.format(url))
             return False
 
         if 'href="login.php"' in response.text and 'login.php' not in url and len(url) >= 22:
-            print('[WARNING] Player {} suddenly logged off, trying to relogin.'.format(self.username))
+            logger.warning('Player {} suddenly logged off, trying to relogin.'.format(self.username))
 
             if not self.login():
                 return False
@@ -76,7 +77,7 @@ class Account(db.Model):
     def login(self):
         page = self.request(self.server_url + app.config['LOGIN_URL'])
         if not page:
-            print('[ERROR] Could not get the login page for {}, login failed.'.format(self.username))
+            logger.error('Could not get the login page for {}, login failed.'.format(self.username))
             return False
 
         parser = BeautifulSoup(page, 'html5lib')
@@ -93,11 +94,13 @@ class Account(db.Model):
 
         page = self.request(self.server_url + app.config['LOGIN_POST_URL'], login_data)
         if not page:
-            print('[ERROR] Could not post login data for {}, login failed.'.format(self.username))
+            logging.error('Could not post login data for {}, login failed.'.format(self.username))
             return False
 
         if 'href="login.php"' in page:
-            print('[ERROR] Could not log in player {}, probably incorrect account data provided.'.format(self.username))
+            logger.error('Could not log in player {}, probably incorrect account data provided.'
+                    .format(self.username))
+
             return False
 
         return True
@@ -105,7 +108,7 @@ class Account(db.Model):
     def get_server_timezone(self):
         page = self.request(self.server_url + app.config['VILLAGE_URL'])
         if not page:
-            print('[ERROR] Could not get the village page for {}.'.format(self.username))
+            logger.error('Could not get the village page for {}.'.format(self.username))
             return False
 
         utc_timestamp = int(datetime.datetime.utcnow().timestamp())
