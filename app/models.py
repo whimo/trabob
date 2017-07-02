@@ -3,6 +3,8 @@ import requests
 import pickle
 import datetime
 from bs4 import BeautifulSoup
+import re
+import random
 
 
 class User(db.Model):
@@ -118,3 +120,46 @@ class Account(db.Model):
 
         self.server_timezone = round((server_timestamp - utc_timestamp) / 3600)
         return self.server_timezone
+
+    def build(self, name, place=None):
+        page = self.request(self.server_url + (app.config['RESOURCES_URL'] if not place else
+                                               app.config['VILLAGE_URL']))
+        parser = BeautifulSoup(page, 'html5lib')
+
+        area = parser.find('area', {'title': re.compile(name + '(?i)')})
+        if area is None:
+            if place is None:
+                return self.build(name, place=1)
+
+            elif place == 1:
+                try:
+                    area = random.choice(parser.find_all('area', {'title': lambda string: len(string) <= 20}))
+                except IndexError:
+                    logger.error('Could not find building area in place {} for {}, player {}.'.format(place, name, self.username))
+                    return False
+            else:
+                logger.error('Could not find building area in place {} for {}, player {}.'.format(place, name, self.username))
+                return False
+
+        page = self.request(self.server_url + '/' + area['href'])
+        parser = BeautifulSoup(page, 'html5lib')
+
+        try:
+            build_page = self.request(self.server_url + '/' + parser.find('button', {'class': 'green build'})['onclick'].split('\'')[1])
+            return True
+
+        except TypeError:
+            try:
+                build_page = self.request(self.server_url +
+                                          '/' + parser.find('img', {'alt': re.compile(name + '(?i)')}).
+                                          parent.parent.parent.
+                                          find('button', {'class': 'green new'})['onclick'].split('\'')[1])
+                return True
+
+            except TypeError:
+                logger.error('Could not build in place {} for {}, player {}.'.format(place, name, self.username))
+
+            except AttributeError:
+                logger.error('Could not build in place {} for {}, player {}.'.format(place, name, self.username))
+
+        return False
