@@ -121,9 +121,13 @@ def build(message):
         return False
 
     account = models.Account.query.get(user.default_account_id)
-    name = ' '.join(message.text.split()[1:])
+    if account is None:
+        bot.send_message(message.chat.id, 'Must set default account: /set_default')
 
-    account.build(name)
+    item = ' '.join(message.text.split()[1:])
+    account.add_to_queue(item)
+
+    bot.send_message(message.chat.id, 'Item added to build queue')
 
 
 bot.polling()

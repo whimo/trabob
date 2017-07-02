@@ -5,6 +5,7 @@ import datetime
 from bs4 import BeautifulSoup
 import re
 import random
+import time
 
 
 class User(db.Model):
@@ -50,6 +51,8 @@ class Account(db.Model):
     session = requests.Session()
     session_dump = db.Column(db.PickleType)
 
+    build_queue = []
+
     def request(self, url, data={}):
         if self.session_dump is not None:
             self.session = pickle.loads(self.session_dump)
@@ -73,6 +76,8 @@ class Account(db.Model):
 
         self.session_dump = pickle.dumps(self.session, 2)
         db.session.commit()
+
+        time.sleep(random.randint(0, 4) + random.random())  # Sleep a bit to avoid being caught
 
         return response.text
 
@@ -120,6 +125,9 @@ class Account(db.Model):
 
         self.server_timezone = round((server_timestamp - utc_timestamp) / 3600)
         return self.server_timezone
+
+    def add_to_queue(self, item):
+        self.build_queue.append(item)
 
     def build(self, name, place=None):
         page = self.request(self.server_url + (app.config['RESOURCES_URL'] if not place else
