@@ -14,10 +14,5 @@ migrate = Migrate(app, db)
 lm = LoginManager(app)
 bcrypt = Bcrypt(app)
 
-import logging
-_default_format = '[%(asctime)] %(levelname): %(message)'
-logging.basicConfig(format=_default_format)
-logger = logging.getLogger()
-
 
 from app import views, models, travian

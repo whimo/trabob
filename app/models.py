@@ -1,4 +1,4 @@
-from app import app, db, logger
+from app import app, db
 import requests
 import pickle
 import datetime
@@ -50,7 +50,6 @@ class Account(db.Model):
     session = requests.Session()
     session_dump = db.Column(db.PickleType)
 
-
     def request(self, url, data={}):
         if self.session_dump is not None:
             self.session = pickle.loads(self.session_dump)
@@ -62,11 +61,11 @@ class Account(db.Model):
                 response = self.session.post(url, headers=app.config['DEFAULT_HEADERS'], data=data)
 
         except Exception:
-            logger.error('Network problem, the URL {} cannot be fetched.'.format(url))
+            print('[ERROR] Network problem, the URL {} cannot be fetched.'.format(url))
             return False
 
         if 'href="login.php"' in response.text and 'login.php' not in url and len(url) >= 22:
-            logger.warning('Player {} suddenly logged off, trying to relogin.'.format(self.username))
+            print('[WARNING] Player {} suddenly logged off, trying to relogin.'.format(self.username))
 
             if not self.login():
                 return False
@@ -80,7 +79,7 @@ class Account(db.Model):
     def login(self):
         page = self.request(self.server_url + app.config['LOGIN_URL'])
         if not page:
-            logger.error('Could not get the login page for {}, login failed.'.format(self.username))
+            print('[ERROR] Could not get the login page for {}, login failed.'.format(self.username))
             return False
 
         parser = BeautifulSoup(page, 'html5lib')
@@ -97,12 +96,12 @@ class Account(db.Model):
 
         page = self.request(self.server_url + app.config['LOGIN_POST_URL'], login_data)
         if not page:
-            logging.error('Could not post login data for {}, login failed.'.format(self.username))
+            print('[ERROR] Could not post login data for {}, login failed.'.format(self.username))
             return False
 
         if 'href="login.php"' in page:
-            logger.error('Could not log in player {}, probably incorrect account data provided.'
-                    .format(self.username))
+            print('[ERROR] Could not log in player {}, probably incorrect account data provided.'
+                  .format(self.username))
 
             return False
 
@@ -111,7 +110,7 @@ class Account(db.Model):
     def get_server_timezone(self):
         page = self.request(self.server_url + app.config['VILLAGE_URL'])
         if not page:
-            logger.error('Could not get the village page for {}.'.format(self.username))
+            print('[ERROR] Could not get the village page for {}.'.format(self.username))
             return False
 
         utc_timestamp = int(datetime.datetime.utcnow().timestamp())
@@ -136,10 +135,10 @@ class Account(db.Model):
                 try:
                     area = random.choice(parser.find_all('area', {'title': lambda string: len(string) <= 20}))
                 except IndexError:
-                    logger.error('Could not find building area in place {} for {}, player {}.'.format(place, name, self.username))
+                    print('[ERROR] Could not find building area in place {} for {}, player {}.'.format(place, name, self.username))
                     return False
             else:
-                logger.error('Could not find building area in place {} for {}, player {}.'.format(place, name, self.username))
+                print('[ERROR] Could not find building area in place {} for {}, player {}.'.format(place, name, self.username))
                 return False
 
         page = self.request(self.server_url + '/' + area['href'])
@@ -158,9 +157,9 @@ class Account(db.Model):
                 return True
 
             except TypeError:
-                logger.error('Could not build in place {} for {}, player {}.'.format(place, name, self.username))
+                print('[ERROR] Could not build in place {} for {}, player {}.'.format(place, name, self.username))
 
             except AttributeError:
-                logger.error('Could not build in place {} for {}, player {}.'.format(place, name, self.username))
+                print('[ERROR] Could not build in place {} for {}, player {}.'.format(place, name, self.username))
 
         return False
