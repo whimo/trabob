@@ -90,4 +90,26 @@ def remove_account(message):
     bot.send_message(message.chat.id, 'Account removed successfully')
 
 
+@bot.message_handler(commands=['set_default'])
+def set_default_account(message):
+    user = models.User.query.filter_by(telegram_chat_id=message.chat.id).first()
+    if user is None:
+        return False
+
+    try:
+        server_name, username = message.text.split()[1:]
+
+    except ValueError:
+        bot.send_message(message.chat.id, 'Usage: `/set_default <server (e.g. ts1.travian.net)> <username>`')
+        return False
+
+    account = models.Account.query.filter_by(server_url='http://' + server_name, username=username).first()
+    if account is None or account.local_user.telegram_chat_id != message.chat.id:
+        bot.send_message(message.chat.id, 'Account not found, probably incorrect data provided')
+        return False
+
+    user.default_account_id = account.id
+    db.session.commit()
+
+
 bot.polling()

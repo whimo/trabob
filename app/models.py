@@ -14,9 +14,10 @@ class User(db.Model):
     password = db.Column(db.String(60))
     telegram_chat_id = db.Column(db.Integer, index=True)
 
-    default_account_id = db.Column(db.Integer)
+    default_account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
 
-    accounts = db.relationship('Account', backref='local_user', lazy='dynamic')
+    accounts = db.relationship('Account', backref='local_user', lazy='dynamic',
+                               foreign_keys='[Account.user_id]')
 
     @property
     def is_authenticated(self):
