@@ -111,5 +111,23 @@ def set_default_account(message):
     user.default_account_id = account.id
     db.session.commit()
 
+    bot.send_message(message.chat.id, 'Default account set successfully')
+
+
+@bot.message_handler(commands=['build'])
+def build(message):
+    user = models.User.query.filter_by(telegram_chat_id=message.chat.id).first()
+    if user is None:
+        return False
+
+    account = models.Account.query.get(user.default_account_id)
+    if account is None:
+        bot.send_message(message.chat.id, 'Must set default account: /set_default')
+
+    item = ' '.join(message.text.split()[1:])
+    account.add_to_queue(item)
+
+    bot.send_message(message.chat.id, 'Item added to build queue')
+
 
 bot.polling()

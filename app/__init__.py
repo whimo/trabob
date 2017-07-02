@@ -15,7 +15,6 @@ migrate = Migrate(app, db)
 lm = LoginManager(app)
 bcrypt = Bcrypt(app)
 
-
 # logging preparations
 
 import logging
@@ -35,7 +34,6 @@ _formatter = logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s', datef
 
 _console_handler.setFormatter(_formatter)
 logger.addHandler(_console_handler)
-
 
 
 from app import views, models, travian
