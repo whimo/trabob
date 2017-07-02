@@ -7,14 +7,14 @@ class Travian(Thread):
     def __init__(self, account_id):
         Thread.__init__(self)
         self.account = models.Account.query.get(account_id)
-        self.shutdown = threading.Event()
+        self.shutdown = Event()
 
     def run(self):
         logger.info('Thread #{id} <{name}> started', id=self.account.id, name=self.account.username)
 
-        while not shutdown.is_set():
+        while not self.shutdown.is_set():
             # Thread work
-            sleep(1)
+            time.sleep(4)
 
         logger.info('Thread #{id} <{name}> stopped', id=self.account.id, name=self.account.username)
 
