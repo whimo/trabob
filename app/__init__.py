@@ -20,7 +20,6 @@ bcrypt = Bcrypt(app)
 import logging
 _format = '[%(asctime)s] %(levelname)s: %(message)s'
 _datefmt = '%m/%d/%Y %I:%M:%S %p'
-logging.basicConfig(format=_format, datefmt=_datefmt)
 logger = logging.getLogger('trabob')
 
 _console_handler = logging.StreamHandler()
