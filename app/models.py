@@ -124,3 +124,13 @@ class Proxy(db.Model):
     url = db.Column(db.String(21))  # max: 255.255.255.255:65535
 
     account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+
+    def ping(self):
+        ''' Return availability of proxy '''
+        import json
+        resp = requests.get('httpbin.org/ip', proxies = {'http' : self.url})
+        if resp.status_code is requests.codes.ok:
+            if json.loads(resp.text)['origin'] is self.url.split(':')[0]:
+                return True
+
+        return False
