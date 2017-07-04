@@ -188,6 +188,6 @@ class Account(db.Model):
             build_duration = 0
 
         self.busy_until = datetime.datetime.utcnow() + datetime.timedelta(seconds=build_duration)
-        db.session.comit()
+        db.session.commit()
 
         return self.busy_until
