@@ -18,7 +18,7 @@ class Travian(Thread):
             if self.account.busy_until is None:
                 self.account.get_busy_until()
 
-            if datetime.datetime.utcnow > self.account.busy_until:
+            if datetime.datetime.utcnow() > self.account.busy_until:
                 time.sleep(random.randint(10, 60))  # Sleep a bit to avoid being caught on automated requests
                 try:
                     self.account.build(self.account.build_queue.pop())
