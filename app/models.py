@@ -16,6 +16,7 @@ class User(db.Model):
     telegram_chat_id = db.Column(db.Integer, index=True)
 
     default_account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    default_account = db.relationship('Account', uselist=False, foreign_keys='[User.default_account_id]')
 
     accounts = db.relationship('Account', backref='local_user', lazy='dynamic',
                                foreign_keys='[Account.user_id]')
