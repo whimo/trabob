@@ -15,14 +15,15 @@ class Travian(Thread):
         print('[INFO] Thread #{} <{}> started'.format(self.account.id, self.account.username))
 
         while not self.shutdown.is_set():
+            if self.account.busy_until is None:
+                self.account.get_busy_until()
+
             if datetime.datetime.utcnow > self.account.busy_until:
                 time.sleep(random.randint(10, 60))  # Sleep a bit to avoid being caught on automated requests
                 try:
                     self.account.build(self.account.build_queue.pop())
                 except IndexError:
                     print('[INFO] Empty build queue for {}.'.format(self.account.username))
-
-            time.sleep(4)
 
         print('[INFO] Thread #{id} <{name}> stopped'.format(self.account.id, self.account.username))
 
