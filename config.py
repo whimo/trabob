@@ -31,3 +31,5 @@ LOGIN_POST_URL = '/dorf1.php'
 
 RESOURCES_URL = '/dorf1.php'
 VILLAGE_URL = '/dorf2.php'
+
+LOGLEVEL = 'DEBUG'
