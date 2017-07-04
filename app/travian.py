@@ -1,4 +1,4 @@
-from app import models
+from app import models, logger
 from threading import Thread, Event
 import time
 import datetime
@@ -12,7 +12,7 @@ class Travian(Thread):
         self.shutdown = Event()
 
     def run(self):
-        print('[INFO] Thread #{} <{}> started'.format(self.account.id, self.account.username))
+        logger.info('Thread #{} <{}> started'.format(self.account.id, self.account.username))
 
         while not self.shutdown.is_set():
             if self.account.busy_until is None:
@@ -23,9 +23,9 @@ class Travian(Thread):
                 try:
                     self.account.build(self.account.build_queue.pop())
                 except IndexError:
-                    print('[INFO] Empty build queue for {}.'.format(self.account.username))
+                    logger.info('Empty build queue for {}.'.format(self.account.username))
 
-        print('[INFO] Thread #{id} <{name}> stopped'.format(self.account.id, self.account.username))
+        logger.info('Thread #{id} <{name}> stopped'.format(self.account.id, self.account.username))
 
 
 travian_threads = [Travian(account.id) for account in models.Account.query.all()]
