@@ -16,6 +16,7 @@ class User(db.Model):
     telegram_chat_id = db.Column(db.Integer, index=True)
 
     default_account_id = db.Column(db.Integer, db.ForeignKey('account.id'))
+    default_account = db.relationship('Account', uselist=False, foreign_keys='[User.default_account_id]')
 
     accounts = db.relationship('Account', backref='local_user', lazy='dynamic',
                                foreign_keys='[Account.user_id]')
@@ -76,6 +77,9 @@ class Account(db.Model):
 
         self.session_dump = pickle.dumps(self.session, 2)
         db.session.commit()
+
+        if 'dorf' in url:
+            self.get_busy_until(response.text)
 
         time.sleep(random.randint(0, 4) + random.random())  # Sleep a bit to avoid being caught
 
@@ -171,3 +175,19 @@ class Account(db.Model):
                 print('[ERROR] Could not build in place {} for {}, player {}.'.format(place, name, self.username))
 
         return False
+
+    def get_busy_until(self, page=None):
+        if page is None:
+            page = self.request(self.server_url + app.config['VILLAGE_URL'])
+
+        parser = BeautifulSoup(page, 'html5lib')
+
+        try:
+            build_duration = min([int(i.span['value']) for i in parser.find_all('div', {'class': 'buildDuration'})])
+        except ValueError:
+            build_duration = 0
+
+        self.busy_until = datetime.datetime.utcnow() + datetime.timedelta(seconds=build_duration)
+        db.session.comit()
+
+        return self.busy_until
