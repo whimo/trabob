@@ -21,7 +21,6 @@ DEFAULT_HEADERS = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=
                    'Accept-Language': 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4',
                    'Cache-Control': 'max-age=0',
                    'Connection': 'keep-alive',
-                   'Host': 'ts6.travian.ru',
                    'Upgrade-Insecure-Requests': '1',
                    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
                    'X-Compress': 'null'}

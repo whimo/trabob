@@ -23,13 +23,13 @@ class Travian(Thread):
                 try:
                     for item in self.account.build_queue:
                         if self.account.build(item):
-                            account.build_queue.remove(item)
+                            self.account.build_queue.remove(item)
                             break
 
                     if self.account.is_roman:
                         for item in self.account.resources_build_queue:
                             if self.account.build(item):
-                                account.resources_build_queue.remove(item)
+                                self.ccount.resources_build_queue.remove(item)
                                 break
 
                 except IndexError:

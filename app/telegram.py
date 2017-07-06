@@ -114,7 +114,7 @@ def set_default_account(message):
     bot.send_message(message.chat.id, 'Default account set successfully')
 
 
-@bot.message_handler(commands=['build'])
+@bot.message_handler(commands=['build', 'rbuild'])
 def build(message):
     user = models.User.query.filter_by(telegram_chat_id=message.chat.id).first()
     if user is None:
@@ -124,8 +124,13 @@ def build(message):
     if account is None:
         bot.send_message(message.chat.id, 'Must set default account: /set_default')
 
-    item = ' '.join(message.text.split()[1:])
-    account.add_to_queue(item)
+    info = message.text.split()
+    item = ' '.join(info[1:])
+
+    if info[0] == '/rbuild' and account.is_roman:
+        account.add_to_queue(item, True)
+    else:
+        account.add_to_queue(item)
 
     bot.send_message(message.chat.id, 'Item added to build queue')
 

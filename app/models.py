@@ -44,10 +44,10 @@ class Account(db.Model):
     username = db.Column(db.String(100))
     password = db.Column(db.String(100))
 
-    is_roman = db.Column(db.Boolean)
-
     server_timezone = db.Column(db.SmallInteger)
     busy_until = db.Column(db.DateTime)
+
+    is_roman = db.Column(db.Boolean)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
@@ -138,8 +138,11 @@ class Account(db.Model):
         self.server_timezone = round((server_timestamp - utc_timestamp) / 3600)
         return self.server_timezone
 
-    def add_to_queue(self, item):
-        self.build_queue.append(item)
+    def add_to_queue(self, item, resources=False):
+        if not resources:
+            self.build_queue.append(item)
+        else:
+            self.resources_build_queue.append(item)
 
     def build(self, name, place=None):
         page = self.request(self.server_url + (app.config['RESOURCES_URL'] if not place else
