@@ -18,21 +18,16 @@ bcrypt = Bcrypt(app)
 # logging preparations
 
 import logging
-_format = '[%(asctime)s] %(levelname)s: %(message)s'
-_datefmt = '%m/%d/%Y %I:%M:%S %p'
 logger = logging.getLogger('trabob')
 
 _console_handler = logging.StreamHandler()
 
-try:
-    _console_handler.setLevel(getattr('logging', config.LOGLEVEL))
-except AttributeError:
-    _console_handler.setLevel(logging.ERROR)
 
-_formatter = logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+_formatter = logging.Formatter('\x1b[36;1m[%(asctime)s]\x1b[0m %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 _console_handler.setFormatter(_formatter)
 logger.addHandler(_console_handler)
+logger.setLevel(getattr(logging, config.LOGLEVEL))
 
 
 from app import views, models, travian
