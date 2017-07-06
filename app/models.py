@@ -44,6 +44,8 @@ class Account(db.Model):
     username = db.Column(db.String(100))
     password = db.Column(db.String(100))
 
+    is_roman = db.Column(db.Boolean)
+
     server_timezone = db.Column(db.SmallInteger)
     busy_until = db.Column(db.DateTime)
 
@@ -52,7 +54,8 @@ class Account(db.Model):
     session = requests.Session()
     session_dump = db.Column(db.PickleType)
 
-    build_queue = []
+    build_queue =  []
+    resources_build_queue = []  # Only for romans
 
     def request(self, url, data={}):
         if self.session_dump is not None:
@@ -113,6 +116,11 @@ class Account(db.Model):
                   .format(self.username))
 
             return False
+
+        parser = BeautifulSoup(page, 'html5lib')
+
+        self.is_roman = bool(parser.find('img', {'class': 'nation nation1'}))
+        db.session.commit()
 
         return True
 
@@ -188,6 +196,6 @@ class Account(db.Model):
             build_duration = 0
 
         self.busy_until = datetime.datetime.utcnow() + datetime.timedelta(seconds=build_duration)
-        db.session.comit()
+        db.session.commit()
 
         return self.busy_until
